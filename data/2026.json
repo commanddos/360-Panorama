@@ -339,7 +339,7 @@
     "tags": ["Capr Greco", "Cypr", "Cyprus"],
     "description": "Cypr zimą. Wycieczka na Cape Greco. Piękna pogoda i cudowne widoki",
     "description_pl": "Cypr zimą. Wycieczka na Cape Greco. Piękna pogoda, ciepło i cudowne widoki",
-    "description_en": "Cyprus in winter. A trip to Cape Greco. Beautiful weather, warm and beautiful views"
+    "description_en": "Cyprus in winter. A trip to Cape Greco. Beautiful weather, warm and beautiful views"	
   },
   {
     "id": "Cypr-Limassol",
@@ -359,5 +359,5 @@
     "description": "Cypr zimą. Pobyt w Limassol",
     "description_pl": "Cypr zimą. Pobyt w Limassol",
     "description_en": "Cyprus in winter Cypr zimą. Stay in Limassol"	
-  },
+  }
 ]
