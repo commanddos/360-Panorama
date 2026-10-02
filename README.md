@@ -1,99 +1,68 @@
-# 360° Panorama Archive — GitHub Pages v2
+# 360° Panorama Archive — GitHub Pages v3
 
-Static catalogue for 360° spherical panoramas hosted externally on Kuula and 360Cities.
+## Struktura danych
 
-## Catalogue hierarchy
-
-The website uses exactly this hierarchy:
-
-**YEAR → COUNTRY → CITY / LOCATION → PANORAMA**
-
-There is deliberately no separate Region or Area level.
-
-Example:
+Dane panoram są podzielone według roku:
 
 ```text
-2026
-├── Germany
-│   ├── Sassnitz
-│   │   ├── Sassnitz Harbour
-│   │   └── Königsstuhl
-│   └── Binz
-│       └── Seafront
-└── Poland
-    └── Warsaw
-        ├── Old Town
-        └── Łazienki Park
+data/
+├── years.json
+├── 2026.json
+├── 2025.json
+└── ...
 ```
 
-## Add a panorama
+`years.json` jest małym manifestem, który mówi stronie, jakie pliki roczne ma załadować. Nie zawiera katalogu panoram.
 
-Edit:
-
-```text
-data/panoramas.json
-```
-
-Use this structure:
+Przykład:
 
 ```json
 {
-  "id": "2026-example-city-location-001",
-  "year": 2026,
-  "country": "Poland",
-  "city": "Warsaw",
-  "location": "Old Town",
-  "title": "Warsaw Old Town",
-  "date": "2026-08-01",
-  "provider": "Kuula",
-  "url": "https://kuula.co/...",
-  "embedUrl": "https://kuula.co/...",
-  "coordinates": {
-    "lat": 52.2497,
-    "lng": 21.0122
-  },
-  "tags": ["Warsaw", "Old Town"],
-  "description": "Description of the panorama."
+  "years": [2026, 2025]
 }
 ```
 
-The site automatically creates the navigation hierarchy from these fields.
+Po dodaniu nowego roku, np. `2027.json`, dopisz `2027` do `data/years.json`.
+
+## Hierarchia strony
+
+**Rok → Kraj → Miasto / Lokalizacja → Panorama**
+
+## Języki
+
+Strona startuje domyślnie po polsku. Przełącznik `PL / EN` znajduje się w prawym górnym rogu. Wybrany język jest zapamiętywany w przeglądarce.
+
+Interfejs jest dwujęzyczny. Dla tytułu i opisu panoramy można opcjonalnie używać pól `title_pl`, `title_en`, `description_pl`, `description_en`; jeśli ich nie ma, strona używa standardowych pól `title` i `description`.
 
 ## GitHub Pages
 
-This is a plain static HTML/CSS/JavaScript site. GitHub Pages can publish static files directly from a repository, and this package includes a GitHub Actions workflow in `.github/workflows/pages.yml`.
+Projekt jest przygotowany jako statyczna strona GitHub Pages z workflow w `.github/workflows/pages.yml`. GitHub Pages może publikować projekt bez osobnego hostingu; dla project site adres ma postać `https://USERNAME.github.io/REPOSITORY/`.
 
-1. Create a **public** GitHub repository, for example `panorama-archive`.
-2. Upload the contents of this ZIP to the repository root.
-3. Make sure `index.html` is at the repository root.
-4. Make sure `.github/workflows/pages.yml` is present.
-5. Go to **Settings → Pages**.
-6. Select **GitHub Actions** as the source if required.
-7. Open **Actions** and wait for the deployment workflow to finish.
-8. The project site will normally be available at:
+## Dodanie panoramy
 
-```text
-https://YOUR-USERNAME.github.io/panorama-archive/
+Dodaj rekord do odpowiedniego pliku, np. `data/2026.json`, a następnie wykonaj commit/push. Nie trzeba zmieniać `app.js`.
+
+Przykład:
+
+```json
+{
+  "id": "2026-sassnitz-harbour-002",
+  "year": 2026,
+  "country": "Germany",
+  "city": "Sassnitz",
+  "location": "Harbour",
+  "title": "Sassnitz Harbour",
+  "title_pl": "Port w Sassnitz",
+  "title_en": "Sassnitz Harbour",
+  "date": "2026-07-24",
+  "provider": "Kuula",
+  "url": "https://kuula.co/...",
+  "embedUrl": "https://kuula.co/...",
+  "coordinates": {"lat":54.515,"lng":13.644},
+  "tags": ["harbour", "Rügen"]
+}
 ```
 
-Relative asset paths are used so the site works as a GitHub Pages project site.
+## Uwaga
 
-## Local testing
-
-From the project directory:
-
-```powershell
-python -m http.server 8000
-```
-
-Then open:
-
-```text
-http://localhost:8000/
-```
-
-Do not open `index.html` directly with `file://`; the JSON catalogue is loaded with `fetch()` and should be served through HTTP.
-
-## Important
-
-The GitHub repository stores catalogue data, links, coordinates and website code. Do **not** upload large original 360° panorama files unless you specifically intend to use GitHub for that storage. Keep the actual panoramas on Kuula/360Cities.
+Nie przechowuj oryginalnych plików panoram 360° w repozytorium. Repozytorium przechowuje katalog, metadane, linki i współrzędne; media pozostają na Kuula/360Cities.
