@@ -12,7 +12,7 @@
     "provider": "Kuula",
     "url": "https://kuula.co/share/collection/7d05b?logo=1&info=1&fs=1&vr=0&zoom=1&thumbs=1",
     "embedUrl": "https://kuula.co/share/collection/7d05b?logo=1&info=1&fs=1&vr=0&zoom=1&thumbs=1",
-    #"coordinates": {"lat": 54.515, "lng": 13.644},
+    "coordinates": {"lat": 54.515, "lng": 13.644},
     "tags": ["Drezno", "Niemcy"],
     "description": "Ciąg dalszy zwiedzania Drezna oraz wycieczka do Pałacyku w Pilnitz",
     "description_pl": "Ciąg dalszy zwiedzania Drezna oraz wycieczka do Pałacyku w Pilnitz",
