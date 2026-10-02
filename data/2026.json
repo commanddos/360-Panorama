@@ -340,24 +340,5 @@
     "description": "Cypr zimą. Wycieczka na Cape Greco. Piękna pogoda i cudowne widoki",
     "description_pl": "Cypr zimą. Wycieczka na Cape Greco. Piękna pogoda, ciepło i cudowne widoki",
     "description_en": "Cyprus in winter. A trip to Cape Greco. Beautiful weather, warm and beautiful views"	
-  },
-  {
-    "id": "Cypr-Limassol",
-    "year": 2026,
-    "country": "Cypr",
-    "city": "Limassol",
-    "location": "Plaże w Limassol",
-    "title": "Cypr - Limassol",
-	"title_pl": "Cypr - Limassol",
-	"title_en": "Cyprus - Limassol",
-    "date": "2026-01-20",
-    "provider": "Kuula",
-    "url": "https://kuula.co/share/collection/7MYG3?logo=1&info=1&fs=1&vr=0&zoom=1&thumbs=1",
-    "embedUrl": "https://kuula.co/share/collection/7MYG3?logo=1&info=1&fs=1&vr=0&zoom=1&thumbs=1",
-    "coordinates": {"lat": 34.7071, "lng": 33.0226},
-    "tags": ["Capr Greco", "Cypr", "Cyprus"],
-    "description": "Cypr zimą. Pobyt w Limassol",
-    "description_pl": "Cypr zimą. Pobyt w Limassol",
-    "description_en": "Cyprus in winter Cypr zimą. Stay in Limassol"	
   }
 ]
