@@ -2,6 +2,7 @@ const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt
 const K=s=>encodeURIComponent(s||'');
 let A=[];
 let YEARS=[];
+let THUMBS={};
 let LANG=localStorage.getItem('panorama-lang')||'pl';
 
 const T={
@@ -22,6 +23,8 @@ function setLang(l){LANG=l;localStorage.setItem('panorama-lang',l);document.docu
 async function load(){
  const manifest=await fetch('data/years.json').then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()});
  YEARS=manifest.years||[];
+ const thumbRes=await fetch('data/thumbnails.json').catch(()=>null);
+ THUMBS=thumbRes?.ok ? await thumbRes.json() : {};
  const files=YEARS.map(y=>fetch(`data/${encodeURIComponent(y)}.json`).then(r=>{if(!r.ok)throw new Error(`HTTP ${r.status}: ${y}.json`);return r.json()}));
  A=(await Promise.all(files)).flat();
  // Global date order: newest panoramas first.
@@ -32,7 +35,8 @@ function P(){return location.hash.replace(/^#\/?/,'').split('/').filter(Boolean)
 function dateValue(p){const d=p?.date||''; const n=Date.parse(d); return Number.isNaN(n)?0:n}
 function label(p){return [p.country,p.city,p.location].filter(Boolean).join(' · ')}
 function textField(p,key){if(key==='title'||key==='description'){return p[`${key}_${LANG}`]??p[key]??''}return p[key]??''}
-function card(p){return `<a class="card" href="#/panorama/${K(p.id)}"><div class="thumb">${p.thumbnail?`<img src="${E(p.thumbnail)}" alt="">`:''}</div><div class="cardbody"><span class="badge">${E(p.provider||'')}</span><h3>${E(textField(p,'title'))}</h3><p>${E(label(p))}</p><p>${E(p.date||'')}</p></div></a>`}
+function card(p){const thumb=THUMBS[p.id]?.url||p.thumbnail||'';const img=thumb?`<img src="${E(thumb)}" alt="${E(textField(p,'title'))}" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.innerHTML='<div class=\"thumbplaceholder\">360°</div>'">`:`<div class="thumbplaceholder">360°</div>`;return `<a class="card" href="#/panorama/${K(p.id)}"><div class="thumb">${img}</div><div class="cardbody"><span class="badge">${E(p.provider||'')}</span><h3>${E(textField(p,'title'))}</h3><p>${E(label(p))}</p><p>${E(p.date||'')}</p></div></a>`} 
+
 function groups(a,f){const m={};a.forEach(x=>(m[x[f]??t('unknown')]??=[]).push(x));return m}
 function tree(title,entries,back='albums'){
  document.querySelector('#app').innerHTML=`<section class="section"><a class="back" href="#/${back}">${t('back')}</a><h1>${E(title)}</h1><div class="tree">${entries.map(([n,z])=>`<a class="treeitem" href="${z.href}"><span class="title">${E(n)}</span><span class="count">${z.n}</span></a>`).join('')}</div></section>`;

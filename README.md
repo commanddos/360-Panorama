@@ -66,3 +66,18 @@ Przykład:
 ## Uwaga
 
 Nie przechowuj oryginalnych plików panoram 360° w repozytorium. Repozytorium przechowuje katalog, metadane, linki i współrzędne; media pozostają na Kuula/360Cities.
+
+## Preview images in Latest Panoramas
+
+The homepage can display a `thumbnail` for each panorama. The v6 demo uses preview photographs from Wikimedia Commons for the sample locations. These are only preview images and are not the hosted 360° panoramas. Each sample card includes a source link. When you add your own panoramas, replace `thumbnail` with your own image URL or a path such as `images/2026/sassnitz-harbour.jpg`.
+
+The sample Wikimedia images and their licensing information are linked from the cards and should be checked before reuse.
+
+
+## Automatic panorama thumbnails
+
+The site can automatically generate the preview image used by Latest Panoramas and panorama cards. During the GitHub Pages deployment workflow, `scripts/generate-thumbnails.mjs` opens each panorama URL from the yearly JSON files and reads its `og:image` (or `twitter:image`) metadata. The result is saved to `data/thumbnails.json`.
+
+For Kuula, this uses the cover/preview image exposed by the shared Kuula page; Kuula documents that each post has a generated thumbnail/cover image. citeturn0search0 For 360Cities, use the actual public panorama URL in the JSON; 360Cities also documents thumbnail formats through its API. citeturn0search6
+
+If a provider does not expose a usable preview image, the card falls back to the `360°` placeholder. You can always override automatic discovery by adding a `thumbnail` field to an individual JSON record.
