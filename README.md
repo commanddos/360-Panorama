@@ -26,7 +26,7 @@ Po dodaniu nowego roku, np. `2027.json`, dopisz `2027` do `data/years.json`.
 
 ## Hierarchia strony
 
-**Rok → Data → Kraj → Miasto / Lokalizacja → Panorama**
+**Rok → Kraj → Miasto / Lokalizacja → Panorama**
 
 ## Języki
 
