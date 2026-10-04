@@ -67,17 +67,40 @@ Przykład:
 
 Nie przechowuj oryginalnych plików panoram 360° w repozytorium. Repozytorium przechowuje katalog, metadane, linki i współrzędne; media pozostają na Kuula/360Cities.
 
-## Preview images in Latest Panoramas
+## Miniatury JPG
 
-The homepage can display a `thumbnail` for each panorama. The v6 demo uses preview photographs from Wikimedia Commons for the sample locations. These are only preview images and are not the hosted 360° panoramas. Each sample card includes a source link. When you add your own panoramas, replace `thumbnail` with your own image URL or a path such as `images/2026/sassnitz-harbour.jpg`.
+Miniatury są przechowywane lokalnie w repozytorium — bez automatycznego pobierania z Kuula/360Cities. Struktura katalogów:
 
-The sample Wikimedia images and their licensing information are linked from the cards and should be checked before reuse.
+```text
+thumbnails/
+├── 2026/
+│   ├── Sassnitz Harbour.jpg
+│   ├── Königsstuhl.jpg
+│   └── ...
+├── 2025/
+│   └── ...
+└── ...
+```
 
+Nazwa pliku JPG jest taka sama jak wartość pola `title` w odpowiednim pliku JSON, z rozszerzeniem `.jpg`. Przykład: dla `"title": "Sassnitz Harbour"` plik musi być `thumbnails/2026/Sassnitz Harbour.jpg`.
 
-## Automatic panorama thumbnails
+Strona automatycznie buduje ścieżkę miniatury na podstawie `year` i `title`. Jeśli pliku nie ma, karta pokazuje zastępcze pole `360°`.
 
-The site can automatically generate the preview image used by Latest Panoramas and panorama cards. During the GitHub Pages deployment workflow, `scripts/generate-thumbnails.mjs` opens each panorama URL from the yearly JSON files and reads its `og:image` (or `twitter:image`) metadata. The result is saved to `data/thumbnails.json`.
+**Ważne:** ponieważ nazwa pliku pochodzi bezpośrednio z `title`, unikaj w `title` znaków niedozwolonych w nazwach plików Windows: `\ / : * ? " < > |`.
 
-For Kuula, this uses the cover/preview image exposed by the shared Kuula page; Kuula documents that each post has a generated thumbnail/cover image. citeturn0search0 For 360Cities, use the actual public panorama URL in the JSON; 360Cities also documents thumbnail formats through its API. citeturn0search6
+## Strona główna
 
-If a provider does not expose a usable preview image, the card falls back to the `360°` placeholder. You can always override automatic discovery by adding a `thumbnail` field to an individual JSON record.
+Na stronie głównej, zamiast sekcji „Latest Panoramas”, wyświetlane są **wszystkie panoramy z ostatniego roku znajdującego się w `data/years.json`**. Są sortowane od najnowszej daty do najstarszej.
+
+Po dodaniu nowego roku, np. `2027`, i wpisaniu go do `data/years.json`, strona automatycznie pokaże na stronie głównej wszystkie panoramy z `2027`.
+
+## Dodawanie miniatury
+
+1. Otwórz odpowiedni plik, np. `data/2026.json`.
+2. Sprawdź dokładną wartość pola `title`.
+3. Utwórz JPG o tej samej nazwie.
+4. Umieść go w `thumbnails/<rok>/`.
+5. Wgraj katalog `thumbnails/<rok>/` do repozytorium GitHub.
+
+Nie trzeba zmieniać `app.js`, `years.json` ani dodawać adresu URL miniatury do JSON.
+

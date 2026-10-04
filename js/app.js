@@ -2,20 +2,19 @@ const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt
 const K=s=>encodeURIComponent(s||'');
 let A=[];
 let YEARS=[];
-let THUMBS={};
 let LANG=localStorage.getItem('panorama-lang')||'pl';
 
 const T={
  pl:{
   'nav.home':'Strona główna','nav.archive':'Archiwum','nav.map':'Mapa','nav.about':'O archiwum','loading':'Ładowanie archiwum…',
   'hero.eyebrow':'Katalog sferycznych panoram 360°','hero.title':'Poznaj archiwum.','hero.text':'Przeglądaj panoramy według <b>roku → kraju → miasta/lokalizacji → panoram</b>. Oryginalne materiały 360° są przechowywane na Kuula lub 360Cities.',
-  'stats.panoramas':'Panoramy','stats.years':'Lata','stats.countries':'Kraje','stats.locations':'Miasta / lokalizacje','browse.year':'Przeglądaj według roku','latest':'Najnowsze panoramy',
+  'stats.panoramas':'Panoramy','stats.years':'Lata','stats.countries':'Kraje','stats.locations':'Miasta / lokalizacje','browse.year':'Przeglądaj według roku','latest':'Panoramy z','latest.en':'Panoramas from',
   'open.archive':'Otwórz archiwum →','back':'← Wstecz','archive':'Archiwum','archive.subtitle':'Rok → Kraj → Miasto / Lokalizacja → Panorama','panorama.map':'Mapa panoram','map.text':'Kliknij znacznik, aby otworzyć panoramę.','open.panorama':'Otwórz panoramę','information':'Informacje','year':'Rok','country':'Kraj','city':'Miasto','location':'Lokalizacja','date':'Data','provider':'Źródło','tags':'Tagi','open.source':'Otwórz w','not.found':'Nie znaleziono panoramy.','no.viewer':'Nie dodano jeszcze adresu widoku panoramy.','about.title':'O archiwum','about.text':'To statyczny katalog publikowany przez GitHub Pages. Przechowuje metadane, linki i współrzędne; materiały 360° pozostają na Kuula lub 360Cities.','hierarchy':'Struktura','adding':'Dodawanie panoramy','adding.text':'Dane są podzielone na osobne pliki JSON dla każdego roku w katalogu data. Lista plików znajduje się w data/years.json.','cannot':'Nie można załadować katalogu:','unknown':'Nieznane','panoramas':'panoram','city.locations':'Miasto / lokalizacja',
  },
  en:{
   'nav.home':'Home','nav.archive':'Archive','nav.map':'Map','nav.about':'About','loading':'Loading archive…',
   'hero.eyebrow':'360° spherical panorama catalogue','hero.title':'Explore the archive.','hero.text':'Browse panoramas by <b>year → country → city/location → panoramas</b>. Original 360° media remains hosted on Kuula or 360Cities.',
-  'stats.panoramas':'Panoramas','stats.years':'Years','stats.countries':'Countries','stats.locations':'Cities / locations','browse.year':'Browse by year','latest':'Latest panoramas',
+  'stats.panoramas':'Panoramas','stats.years':'Years','stats.countries':'Countries','stats.locations':'Cities / locations','browse.year':'Browse by year','latest':'Panoramas from',
   'open.archive':'Open archive →','back':'← Back','archive':'Archive','archive.subtitle':'Year → Country → City / Location → Panorama','panorama.map':'Panorama map','map.text':'Click a marker to open a panorama.','open.panorama':'Open panorama','information':'Information','year':'Year','country':'Country','city':'City','location':'Location','date':'Date','provider':'Provider','tags':'Tags','open.source':'Open on','not.found':'Panorama not found.','no.viewer':'No panorama viewer URL added yet.','about.title':'About','about.text':'This is a static catalogue published with GitHub Pages. It stores metadata, links and coordinates; the 360° media remains hosted by Kuula or 360Cities.','hierarchy':'Hierarchy','adding':'Adding a panorama','adding.text':'Data is split into separate JSON files for each year in the data folder. The file list is maintained in data/years.json.','cannot':'Cannot load catalogue:','unknown':'Unknown','panoramas':'panoramas','city.locations':'City / location'
  }};
 function t(k){return T[LANG][k]||T.en[k]||k}
@@ -23,8 +22,6 @@ function setLang(l){LANG=l;localStorage.setItem('panorama-lang',l);document.docu
 async function load(){
  const manifest=await fetch('data/years.json').then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()});
  YEARS=manifest.years||[];
- const thumbRes=await fetch('data/thumbnails.json').catch(()=>null);
- THUMBS=thumbRes?.ok ? await thumbRes.json() : {};
  const files=YEARS.map(y=>fetch(`data/${encodeURIComponent(y)}.json`).then(r=>{if(!r.ok)throw new Error(`HTTP ${r.status}: ${y}.json`);return r.json()}));
  A=(await Promise.all(files)).flat();
  // Global date order: newest panoramas first.
@@ -35,7 +32,8 @@ function P(){return location.hash.replace(/^#\/?/,'').split('/').filter(Boolean)
 function dateValue(p){const d=p?.date||''; const n=Date.parse(d); return Number.isNaN(n)?0:n}
 function label(p){return [p.country,p.city,p.location].filter(Boolean).join(' · ')}
 function textField(p,key){if(key==='title'||key==='description'){return p[`${key}_${LANG}`]??p[key]??''}return p[key]??''}
-function card(p){const thumb=THUMBS[p.id]?.url||p.thumbnail||'';const img=thumb?`<img src="${E(thumb)}" alt="${E(textField(p,'title'))}" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.innerHTML='<div class=\"thumbplaceholder\">360°</div>'">`:`<div class="thumbplaceholder">360°</div>`;return `<a class="card" href="#/panorama/${K(p.id)}"><div class="thumb">${img}</div><div class="cardbody"><span class="badge">${E(p.provider||'')}</span><h3>${E(textField(p,'title'))}</h3><p>${E(label(p))}</p><p>${E(p.date||'')}</p></div></a>`} 
+function thumbnailPath(p){return `thumbnails/${encodeURIComponent(p.year)}/${encodeURIComponent(p.title)}.jpg`}
+function card(p){const thumb=thumbnailPath(p);const img=thumb?`<img src="${E(thumb)}" alt="${E(textField(p,'title'))}" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.innerHTML='<div class=\"thumbplaceholder\">360°</div>'">`:`<div class="thumbplaceholder">360°</div>`;return `<a class="card" href="#/panorama/${K(p.id)}"><div class="thumb">${img}</div><div class="cardbody"><span class="badge">${E(p.provider||'')}</span><h3>${E(textField(p,'title'))}</h3><p>${E(label(p))}</p><p>${E(p.date||'')}</p></div></a>`} 
 
 function groups(a,f){const m={};a.forEach(x=>(m[x[f]??t('unknown')]??=[]).push(x));return m}
 function tree(title,entries,back='albums'){
@@ -43,7 +41,9 @@ function tree(title,entries,back='albums'){
 }
 function home(){
  const ys=[...new Set(A.map(x=>x.year))].sort((a,b)=>b-a),cs=new Set(A.map(x=>x.country)),ls=new Set(A.map(x=>`${x.city||''} · ${x.location||''}`));
- document.querySelector('#app').innerHTML=`<section class="hero"><div class="eyebrow">${t('hero.eyebrow')}</div><h1>${t('hero.title')}</h1><p>${t('hero.text')}</p><div class="stats"><div class="stat"><strong>${A.length}</strong><span class="muted">${t('stats.panoramas')}</span></div><div class="stat"><strong>${ys.length}</strong><span class="muted">${t('stats.years')}</span></div><div class="stat"><strong>${cs.size}</strong><span class="muted">${t('stats.countries')}</span></div><div class="stat"><strong>${ls.size}</strong><span class="muted">${t('stats.locations')}</span></div></div></section><section class="section"><h2>${t('browse.year')}</h2><div class="grid">${ys.map(y=>`<a class="card" href="#/year/${K(y)}"><div class="cardbody"><span class="badge">${y}</span><h3>${A.filter(x=>x.year==y).length} ${t('panoramas')}</h3><p>${t('open.archive')}</p></div></a>`).join('')}</div></section><section class="section"><h2>${t('latest')}</h2><div class="grid">${A.slice(0,6).map(card).join('')}</div></section>`;
+ const latestYear=ys[0];
+ const latest=A.filter(x=>x.year===latestYear).sort((a,b)=>dateValue(b)-dateValue(a));
+ document.querySelector('#app').innerHTML=`<section class="hero"><div class="eyebrow">${t('hero.eyebrow')}</div><h1>${t('hero.title')}</h1><p>${t('hero.text')}</p><div class="stats"><div class="stat"><strong>${A.length}</strong><span class="muted">${t('stats.panoramas')}</span></div><div class="stat"><strong>${ys.length}</strong><span class="muted">${t('stats.years')}</span></div><div class="stat"><strong>${cs.size}</strong><span class="muted">${t('stats.countries')}</span></div><div class="stat"><strong>${ls.size}</strong><span class="muted">${t('stats.locations')}</span></div></div></section><section class="section"><h2>${t('browse.year')}</h2><div class="grid">${ys.map(y=>`<a class="card" href="#/year/${K(y)}"><div class="cardbody"><span class="badge">${y}</span><h3>${A.filter(x=>x.year==y).length} ${t('panoramas')}</h3><p>${t('open.archive')}</p></div></a>`).join('')}</div></section><section class="section"><h2>${t('latest')} ${latestYear}</h2><div class="grid">${latest.map(card).join('')}</div></section>`;
 }
 function yearPage(y){const arr=A.filter(x=>String(x.year)===String(y));const g=groups(arr,'country');tree(String(y),Object.entries(g).map(([n,z])=>[n,{n:z.length,href:`#/year/${K(y)}/country/${K(n)}`}]),'albums')}
 function countryPage(y,c){const arr=A.filter(x=>String(x.year)===String(y)&&x.country===c);const g=groups(arr,'city');tree(`${y} · ${c}`,Object.entries(g).map(([city,z])=>[city,{n:z.length,href:`#/year/${K(y)}/country/${K(c)}/city/${K(city)}`}]),`year/${K(y)}`)}
