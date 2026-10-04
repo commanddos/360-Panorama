@@ -15,6 +15,22 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: actions/configure-pages@v5
+      - name: Normalize thumbnail JPGs to 285x362
+        shell: bash
+        run: |
+          set -e
+          found=0
+          while IFS= read -r -d '' file; do
+            found=1
+            tmp="${file}.tmp.jpg"
+            magick "$file" -auto-orient -resize "285x362^" -gravity center -extent 285x362 -strip -quality 90 "$tmp"
+            mv -f "$tmp" "$file"
+          done < <(find thumbnails -type f \( -iname '*.jpg' -o -iname '*.jpeg' \) -print0)
+          if [ "$found" -eq 0 ]; then
+            echo "No thumbnail JPG files found; skipping resize."
+          else
+            echo "All thumbnail JPG files normalized to 285x362 px."
+          fi
       - uses: actions/upload-pages-artifact@v4
         with: {path: '.'}
       - id: deployment
