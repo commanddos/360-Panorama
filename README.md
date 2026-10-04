@@ -106,3 +106,5 @@ Nie trzeba zmieniać `app.js`, `years.json` ani dodawać adresu URL miniatury do
 ### Automatic thumbnail sizing
 All JPG/JPEG files placed anywhere under `thumbnails/` are automatically normalized during GitHub Pages deployment to **285 × 362 px**. The image is scaled proportionally and center-cropped to fill the exact dimensions; it is not stretched.
 
+The GitHub Actions workflow is compatible with both common ImageMagick command styles: ImageMagick 7 (`magick`) and ImageMagick 6 (`convert`). If ImageMagick is not available on the runner, the workflow installs it automatically and then detects the available command.
+
