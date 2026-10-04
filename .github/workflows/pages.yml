@@ -1,37 +1,99 @@
 name: Deploy to GitHub Pages
+
 on:
   push:
     branches: [main]
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - uses: actions/checkout@v6
+
       - uses: actions/configure-pages@v5
+
+      - name: Install ImageMagick if needed
+        shell: bash
+        run: |
+          set -e
+
+          if command -v magick >/dev/null 2>&1; then
+            echo "ImageMagick detected: magick"
+          elif command -v convert >/dev/null 2>&1 && convert -version 2>/dev/null | grep -qi 'ImageMagick'; then
+            echo "ImageMagick detected: convert"
+          else
+            echo "ImageMagick not found. Installing..."
+            sudo apt-get update
+            sudo apt-get install -y imagemagick
+          fi
+
       - name: Normalize thumbnail JPGs to 285x362
         shell: bash
         run: |
           set -e
+
+          # ImageMagick 7 normally uses "magick".
+          # ImageMagick 6 normally uses "convert".
+          if command -v magick >/dev/null 2>&1; then
+            IM_CMD="magick"
+          elif command -v convert >/dev/null 2>&1 && convert -version 2>/dev/null | grep -qi 'ImageMagick'; then
+            IM_CMD="convert"
+          else
+            echo "ERROR: ImageMagick was not found after installation."
+            exit 1
+          fi
+
+          echo "Using ImageMagick command: $IM_CMD"
+          "$IM_CMD" -version | head -n 1
+
+          if [ ! -d thumbnails ]; then
+            echo "No thumbnails directory found; skipping resize."
+            exit 0
+          fi
+
           found=0
+
           while IFS= read -r -d '' file; do
             found=1
+            echo "Normalizing: $file"
+
             tmp="${file}.tmp.jpg"
-            magick "$file" -auto-orient -resize "285x362^" -gravity center -extent 285x362 -strip -quality 90 "$tmp"
+
+            "$IM_CMD" "$file" \
+              -auto-orient \
+              -resize "285x362^" \
+              -gravity center \
+              -extent 285x362 \
+              -strip \
+              -quality 90 \
+              "$tmp"
+
             mv -f "$tmp" "$file"
-          done < <(find thumbnails -type f \( -iname '*.jpg' -o -iname '*.jpeg' \) -print0)
+
+          done < <(
+            find thumbnails -type f \
+              \( -iname '*.jpg' -o -iname '*.jpeg' \) \
+              -print0
+          )
+
           if [ "$found" -eq 0 ]; then
-            echo "No thumbnail JPG files found; skipping resize."
+            echo "No thumbnail JPG/JPEG files found; skipping resize."
           else
-            echo "All thumbnail JPG files normalized to 285x362 px."
+            echo "All thumbnail JPG/JPEG files normalized to exactly 285x362 px."
           fi
+
       - uses: actions/upload-pages-artifact@v4
-        with: {path: '.'}
+        with:
+          path: .
+
       - id: deployment
         uses: actions/deploy-pages@v4
