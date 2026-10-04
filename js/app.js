@@ -33,7 +33,13 @@ function dateValue(p){const d=p?.date||''; const n=Date.parse(d); return Number.
 function label(p){return [p.country,p.city,p.location].filter(Boolean).join(' · ')}
 function textField(p,key){if(key==='title'||key==='description'){return p[`${key}_${LANG}`]??p[key]??''}return p[key]??''}
 function thumbnailPath(p){return `thumbnails/${encodeURIComponent(p.year)}/${encodeURIComponent(p.title)}.jpg`}
-function card(p){const thumb=thumbnailPath(p);const img=thumb?`<img src="${E(thumb)}" alt="${E(textField(p,'title'))}" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.innerHTML='<div class=\"thumbplaceholder\">360°</div>'">`:`<div class="thumbplaceholder">360°</div>`;return `<a class="card" href="#/panorama/${K(p.id)}"><div class="thumb">${img}</div><div class="cardbody"><span class="badge">${E(p.provider||'')}</span><h3>${E(textField(p,'title'))}</h3><p>${E(label(p))}</p><p>${E(p.date||'')}</p></div></a>`} 
+function card(p){
+ const thumb=thumbnailPath(p);
+ const img=thumb
+  ? `<img src="${E(thumb)}" alt="${E(textField(p,'title'))}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none';this.parentElement.classList.add('missing-thumb')">`
+  : '';
+ return `<a class="card" href="#/panorama/${K(p.id)}"><div class="thumb">${img}</div><div class="cardbody"><span class="badge">${E(p.provider||'')}</span><h3>${E(textField(p,'title'))}</h3><p>${E(label(p))}</p><p>${E(p.date||'')}</p></div></a>`;
+}
 
 function groups(a,f){const m={};a.forEach(x=>(m[x[f]??t('unknown')]??=[]).push(x));return m}
 function tree(title,entries,back='albums'){
@@ -43,7 +49,7 @@ function home(){
  const ys=[...new Set(A.map(x=>x.year))].sort((a,b)=>b-a),cs=new Set(A.map(x=>x.country)),ls=new Set(A.map(x=>`${x.city||''} · ${x.location||''}`));
  const latestYear=ys[0];
  const latest=A.filter(x=>x.year===latestYear).sort((a,b)=>dateValue(b)-dateValue(a));
- document.querySelector('#app').innerHTML=`<section class="hero"><div class="eyebrow">${t('hero.eyebrow')}</div><h1>${t('hero.title')}</h1><p>${t('hero.text')}</p><div class="stats"><div class="stat"><strong>${A.length}</strong><span class="muted">${t('stats.panoramas')}</span></div><div class="stat"><strong>${ys.length}</strong><span class="muted">${t('stats.years')}</span></div><div class="stat"><strong>${cs.size}</strong><span class="muted">${t('stats.countries')}</span></div><div class="stat"><strong>${ls.size}</strong><span class="muted">${t('stats.locations')}</span></div></div></section><section class="section"><h2>${t('browse.year')}</h2><div class="grid">${ys.map(y=>`<a class="card" href="#/year/${K(y)}"><div class="cardbody"><span class="badge">${y}</span><h3>${A.filter(x=>x.year==y).length} ${t('panoramas')}</h3><p>${t('open.archive')}</p></div></a>`).join('')}</div></section><section class="section"><h2>${t('latest')} ${latestYear}</h2><div class="grid">${latest.map(card).join('')}</div></section>`;
+ document.querySelector('#app').innerHTML=`<section class="hero"><div class="eyebrow">${t('hero.eyebrow')}</div><h1>${t('hero.title')}</h1><p>${t('hero.text')}</p><div class="stats"><div class="stat"><strong>${A.length}</strong><span class="muted">${t('stats.panoramas')}</span></div><div class="stat"><strong>${ys.length}</strong><span class="muted">${t('stats.years')}</span></div><div class="stat"><strong>${cs.size}</strong><span class="muted">${t('stats.countries')}</span></div><div class="stat"><strong>${ls.size}</strong><span class="muted">${t('stats.locations')}</span></div></div></section><section class="section"><h2>${t('browse.year')}</h2><div class="grid">${ys.map(y=>`<a class="card" href="#/year/${K(y)}"><div class="cardbody"><span class="badge">${y}</span><h3>${A.filter(x=>x.year==y).length} ${t('panoramas')}</h3><p>${t('open.archive')}</p></div></a>`).join('')}</div></section><section class="section"><h2>${t('latest')} ${latestYear}</h2><div class="grid panorama-grid">${latest.map(card).join('')}</div></section>`;
 }
 function yearPage(y){const arr=A.filter(x=>String(x.year)===String(y));const g=groups(arr,'country');tree(String(y),Object.entries(g).map(([n,z])=>[n,{n:z.length,href:`#/year/${K(y)}/country/${K(n)}`}]),'albums')}
 function countryPage(y,c){const arr=A.filter(x=>String(x.year)===String(y)&&x.country===c);document.querySelector('#app').innerHTML=`<section class="section"><a class="back" href="#/year/${K(y)}">${t('back')}</a><h1>${E(y)} · ${E(c)}</h1><p class="muted">${arr.length} ${t('panoramas')}</p><div class="grid panorama-grid">${[...arr].sort((a,b)=>dateValue(b)-dateValue(a)).map(card).join('')}</div></section>`}

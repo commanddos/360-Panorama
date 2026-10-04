@@ -5,3 +5,10 @@
 
 .grid .card,.panorama-grid .card{flex:0 0 285px;width:285px;max-width:285px}
 @media(max-width:760px){.grid .card,.panorama-grid .card,.thumb{width:285px;max-width:285px}.thumb{height:362px}}
+
+/* v17: dedicated panorama thumbnail layout */
+.panorama-grid{display:grid!important;grid-template-columns:repeat(auto-fill,285px)!important;gap:16px;align-items:start;justify-content:start}
+.panorama-grid .card{width:285px!important;max-width:285px!important;min-width:285px;display:block}
+.panorama-grid .thumb{width:285px;height:362px}
+.thumb.missing-thumb::after{content:"360°";position:absolute;inset:0;display:grid;place-items:center;color:#8b949e;font-weight:800;letter-spacing:.08em;background:linear-gradient(135deg,#161b22,#21262d)}
+@media(max-width:330px){.panorama-grid{grid-template-columns:minmax(0,285px)!important}.panorama-grid .card,.panorama-grid .thumb{max-width:100%!important}}
