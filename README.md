@@ -26,7 +26,7 @@ Po dodaniu nowego roku, np. `2027.json`, dopisz `2027` do `data/years.json`.
 
 ## Hierarchia strony
 
-**Rok → Kraj → Miasto / Lokalizacja → Panorama**
+**Rok → Kraj → Panorama**
 
 ## Języki
 
@@ -103,4 +103,6 @@ Po dodaniu nowego roku, np. `2027`, i wpisaniu go do `data/years.json`, strona a
 5. Wgraj katalog `thumbnails/<rok>/` do repozytorium GitHub.
 
 Nie trzeba zmieniać `app.js`, `years.json` ani dodawać adresu URL miniatury do JSON.
+### Automatic thumbnail sizing
+All JPG/JPEG files placed anywhere under `thumbnails/` are automatically normalized during GitHub Pages deployment to **285 × 362 px**. The image is scaled proportionally and center-cropped to fill the exact dimensions; it is not stretched.
 
